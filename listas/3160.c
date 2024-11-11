@@ -1,53 +1,84 @@
-#include<stdio.h> //ler 2 listas (amigos velhos e amigos novos),juntar as duas e imprimir (se a 3 linha tiver um nome, colocar todos os novos antes desse nome)
-#include<stdlib.h>
-#define MAX 1000
+//programa que recebe 2 listas (amigos velhos e amigos novos),junta as duas e imprime (se a 3° linha tiver um nome, colocar todos os novos antes desse nome)
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
 
-struct no{
-    char nome[20];
-    struct no *prox;
-};
+typedef struct amigo { //criação do nó "amigo"
+    char nome[50];
+    struct amigo *prox;
+} Amigos;
 
-typedef struct no No;
+void adicionarAmigo(Amigos **listaAmigos, char *nomeAmigo) { //função que adiciona um amigo na lista
+    Amigos *novoAmigo = (Amigos*)malloc(sizeof(Amigos));
+    Amigos *amigoAtual = *listaAmigos;
 
-typedef struct{
-    struct no *inicio;
-}lista;
+    strncpy(novoAmigo->nome, nomeAmigo, sizeof(novoAmigo->nome) - 1);
+    novoAmigo->nome[sizeof(novoAmigo->nome) - 1] = '\0';
+    novoAmigo->prox = NULL;
 
-int main(){
-    char vetor1[MAX],vetor2[MAX],vetor3[MAX];
-    int i=0,j=0,h=0;
-    lista *l1,*l2;
+    while(amigoAtual->prox != NULL) {
+        amigoAtual = amigoAtual->prox;
+    }
 
-    gets(vetor1);
-    gets(vetor2);
-    gets(vetor3);
+    amigoAtual->prox = novoAmigo;
+}
 
-    while(vetor1[i]!='\0'){ //começa a dividir as palavras em listas
-        while(vetor1[i]!=' '){
-            No *no1; //cria uma variável dinâmica
-            no1=malloc(sizeof(No));
-            l1->inicio=no1;
-            no1->nome[h]=vetor1[i];
-            i++;
+void adicionarAmigoAntes(Amigos **listaAmigos, char *nomeAmigo, char *nomeProcurado) { //procura o nome da 3° linha, se houver
+    Amigos *novoAmigo = (Amigos*)malloc(sizeof(Amigos));
+    Amigos *amigoAnterior = *listaAmigos;
+    Amigos *amigoAtual = *listaAmigos;
+
+    strncpy(novoAmigo->nome, nomeAmigo, sizeof(novoAmigo->nome) - 1);
+    novoAmigo->nome[sizeof(novoAmigo->nome) - 1] = '\0';
+    novoAmigo->prox = NULL;
+
+    while(strcmp(amigoAtual->nome, nomeProcurado) && amigoAtual->prox != NULL) {
+        amigoAnterior = amigoAtual;
+        amigoAtual = amigoAtual->prox;
+    }
+
+    if (!strcmp(amigoAtual->nome, nomeProcurado)) {
+        novoAmigo->prox = amigoAtual;
+        amigoAnterior->prox = novoAmigo;
+    } else {
+        amigoAtual->prox = novoAmigo;
+    }
+}
+
+void imprimirAmigos(Amigos *amigoAtual) { //imprime a nova lista de amigos
+    while (amigoAtual != NULL) {
+        printf("%s", amigoAtual->nome);
+        if (amigoAtual->prox != NULL) {
+            printf(" ");
         }
-        //no1->prox como linkar o nó com o próximo se ele não existe ainda?
-        h=0;
+        amigoAtual = amigoAtual->prox;
     }
-    i=0;
-    h=0;
-    while(vetor2[i]!='\0'){
-        while(vetor2[i]!=' '){
-            No *no2;
-            no2=malloc(sizeof(No));
-            no2->nome[h]=vetor2[i];
-            i++;
-        }
-        h=0;
+    printf("\n");
+}
+
+int main() {
+    Amigos *lista_amigos = (Amigos*)malloc(sizeof(Amigos));
+    lista_amigos->nome[0] = '\0';
+    lista_amigos->prox = NULL;
+    char amigos_iniciais[1000], novos_amigos[1000], amigo_procurado[50], *amigo;
+
+    scanf(" %[^\n]", amigos_iniciais);
+    scanf(" %[^\n]", novos_amigos);
+    scanf(" %[^\n]", amigo_procurado);
+
+    amigo = strtok(amigos_iniciais, " ");
+
+    while (amigo != NULL) {
+        adicionarAmigo(&lista_amigos, amigo);
+        amigo = strtok(NULL, " ");
     }
-    if(vetor3=='nao'){
-        //continua o programa normalmente
+
+    amigo = strtok(novos_amigos, " ");
+
+    while (amigo != NULL) {
+        adicionarAmigoAntes(&lista_amigos, amigo, amigo_procurado);
+        amigo = strtok(NULL, " ");
     }
-    else{
-        //le o nome do amigo
-    }
+
+    imprimirAmigos(lista_amigos->prox);
 }
