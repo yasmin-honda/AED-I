@@ -15,11 +15,12 @@ typedef struct no{
 }No;
 
 void inserir_fim(No **fila,int num){
-    No *aux;
-    aux=*fila;
+    No *novo;
     
     if(fila->prox==NULL){
-        aux=
+        fila->prox=novo;
+        novo->marcador=num;
+        novo->prox=NULL;
     }
     
 }
@@ -39,3 +40,4 @@ int main(){
     }
 
 }
+
