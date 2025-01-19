@@ -1,3 +1,4 @@
+//Programa que recebe n matrizes 9x9 e identifica se elas seguem o formato do sudoku
 #include <stdio.h>
 #include <stdbool.h>
 
