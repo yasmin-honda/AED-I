@@ -3,66 +3,51 @@
 #include<stdlib.h>
 #define MAX 100000
 
-typedef struct no{
-    int valor;
-    struct no *prox;
-}No;
+void intercala(int v[MAX],int inicio, int meio, int fim){
+    int i=inicio,j=meio,k=0,*vt;
 
-void inserir_ordenado(No **lista, int num){ //a lista pode ser sem cabeça porque já vou ordenar aqui mesmo
-    No *aux=*lista,*novo=malloc(sizeof(No));
-
-    novo->valor=num;
-    novo->prox=NULL;
-    if(*lista==NULL) *lista=novo;
-    else if(novo->valor<(*lista)->valor){
-        novo->prox=*lista;
-        *lista=novo;
+    vt=malloc(sizeof(int)*(fim-inicio));
+    while(i<meio && j<fim){
+        if(v[i]<v[j]) vt[k++]=v[i++];
+        else vt[k++]=v[j++];
     }
-    else{
-        while(aux->prox && novo->valor>aux->prox->valor)aux=aux->prox;
-        novo->prox=aux->prox;
-        aux->prox=novo;
-        }
+    while(i<meio)vt[k++]=v[i++];
+    while(j<fim)vt[k++]=v[j++];
+
+    for(i=inicio;i<fim;i++){
+        v[i]=vt[i-inicio];
+    }
+
+    free(vt);
 }
 
-void imprimir_crescente(No *lista){
-    No *aux=lista,*temp;
-    while(aux){
-        printf("%d\n",aux->valor);
-        temp=aux;
-        aux=aux->prox;
-        free(temp);
-    }
-}
+void merge_sort(int v[MAX],int inicio, int fim){
+    int q;
 
-void imprimir_decrescente(No *lista,int tam){
-    int temporario[MAX],i=tam-1;
-    No *aux=lista;
-
-    while(aux){
-        temporario[i--]=aux->valor;
-        aux=aux->prox;
-    }
-    for(int i=0;i<tam;i++){
-        printf("%d\n",temporario[i]);
+    if(inicio<fim-1){
+        q=(inicio+fim)/2;
+        merge_sort(v,inicio,q);
+        merge_sort(v,q,fim);
+        intercala(v,inicio,q,fim);
     }
 }
 
 int main(){
-    int n,aux,cont=0;
-    No *listap,*listai;
+    int n,vetori[MAX],vetorp[MAX],aux,tamp=0,tami=0;
 
     scanf("%d",&n);
-    listap=NULL;
-    listai=NULL;
     for(int i=0;i<n;i++){
         scanf("%d",&aux);
-        if(aux%2==0)inserir_ordenado(&listap,aux);
-        else{
-            inserir_ordenado(&listai,aux);
-            cont++;
-        }
+        if(aux%2==0)vetorp[tamp++]=aux;
+        else vetori[tami++]=aux;
     }
-    imprimir_crescente(listap);
-    imprimir_decrescente(listai,cont);
+    merge_sort(vetori,0,tami);
+    merge_sort(vetorp,0,tamp);
+    for(int i=0;i<tamp;i++){
+        printf("%d\n",vetorp[i]);
+    }
+    for(int j=tami-1;j>=0;j--){
+        printf("%d\n",vetori[j]);
+    }
 }
+
