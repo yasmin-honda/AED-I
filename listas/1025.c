@@ -1,76 +1,73 @@
 /*Programa que recebe x casos de teste (x<=65) com dois inteiros dizendo o número de peças de mármore e a quantidade de buscas a serem feitas, respectivamente
-Utiliza lista com inserção ordenada para garantir o funcionamento correto da busca
-Retorna a posição da chave de busca, se encontrado, ou imprime "not found"
+Utiliza merge sort para ordenação dos vetores
+Busca e retorna
 */
 #include<stdio.h>
-#include<stdlib.h>
 #define MAX 10000
 
-typedef struct no{
-    int valor;
-    struct no *prox;
-}No;
+void intercala(int inicio, int meio, int fim, int vetor[]) {
 
-void inserir_ordenado(No *head, int num){
-    No *aux=head,*novo=malloc(sizeof(No));
+    int i, j, k, *vt;
 
-    novo->valor=num;
-    if(head->prox==NULL){
-        novo->prox=NULL;
-        head->prox=novo;
+    vt = (int*)malloc(sizeof(int) * (fim - inicio));
+    i = inicio;
+    j = meio;
+    k = 0;
+    while (i < meio && j < fim) {
+
+        if (vetor[i] < vetor[j]) vt[k++] = vetor[i++];
+        else vt[k++] = vetor[j++];
     }
-    else{
-        while(aux->prox && aux->prox->valor<novo->valor)aux=aux->prox;
-        No *aux2=aux->prox;
-        aux->prox=novo;
-        novo->prox=aux2;
+    while (i < meio) {
+      vt[k++] = vetor[i++];
     }
+    while (j < fim) {
+      vt[k++] = vetor[j++];
+    }
+    for (i = inicio; i < fim; i++) {
+      vetor[i] = vt[i - inicio];
+    }
+    free(vt);
+
 }
 
-int busca(No *head,int chave){
-    No *aux=head;
-    int cont=1;
+void mergeSort(int inicio, int fim, int vetor[]) {
 
-    while(aux->prox &&aux->prox->valor<chave){
-        aux=aux->prox;
-        cont++;
-    }
-    if(aux->prox->valor==chave)return cont;
-    else return 0;
+  if (inicio < fim - 1) {
+    int q = (inicio + fim)/2;
+
+    mergeSort(inicio, q, vetor);
+    mergeSort(q, fim, vetor);
+    intercala(inicio, q, fim, vetor);
+  }
 }
 
-void limpar(No *head){
-    No *temp,*aux=head->prox;
-
-    while(aux){
-        temp=aux;
-        aux=aux->prox;
-        free(temp);
+int busca(int vetor[MAX],int tam,int chave){
+    for(int i=0;i<tam;i++){
+        if(vetor[i]==chave)return i+1;
     }
+    return 0;
 }
 
 int main(){
-    No *lista=malloc(sizeof(No));
-    int n,q,marmore,achou[MAX][2],teste=0;
+    int n,q,marmore[MAX],achou[MAX][2],teste=0;
 
     while(1){
         scanf("%d %d",&n,&q);
         if(n==0 && q==0)break;
         teste++;
-        lista->prox=NULL;
         for(int i=0;i<n;i++){
-            scanf("%d",&marmore);
-            inserir_ordenado(lista,marmore);
+            scanf("%d",&marmore[i]);
         }
+        mergeSort(0,n,marmore);
         for(int i=0;i<q;i++){
             scanf("%d",&achou[i][0]);
-            achou[i][1]=busca(lista,achou[i][0]);
+            achou[i][1]=busca(marmore,n,achou[i][0]);
         }
         printf("CASE# %d:\n",teste);
         for(int i=0;i<q;i++){
             if(achou[i][1]==0)printf("%d not found\n",achou[i][0]);
             else printf("%d found at %d\n",achou[i][0],achou[i][1]);
         }
-        limpar(lista);
     }
 }
